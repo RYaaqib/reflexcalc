@@ -160,6 +160,6 @@ cython_debug/
 #.idea/
 
 /chains
-/processed_real/*/*/
+/processed_real/*/*/*.txt
 /processed_real
-processed_real/*/*/
+processed_real/*/*/*.txt
