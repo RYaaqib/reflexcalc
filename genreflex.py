@@ -173,12 +173,6 @@ def plot_reflex_model(cube, rgal, vgal, ax=None, quant="vlos", vlosnorm=None,mul
 
     l,b,dist, vlos, mul, mub = get_v(cube,rgal*300., vgal*240./1.4, solar=False)
 
-    print("the first 5 values of dist, vlos, mul, mub are:")
-    print("dist: ", dist[:5])
-    print("vlos: ", vlos[:5])
-    print("vl: ", mul[:5])
-    print("vb: ", mub[:5])
-
     if ax == None:
         fig, ax = plt.subplots(3, facecolor="white", figsize=(4, 8), subplot_kw={'projection': 'mollweide'})
     else:
