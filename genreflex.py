@@ -2,7 +2,7 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pylab as plt
 import matplotlib.cm as cm
-
+from matplotlib.ticker import MultipleLocator
 from coord import *
 """
 This script is used to generate the reflex motion for halo stars in the MW. The best fit values are the same as those foundin
@@ -15,6 +15,43 @@ vsun_mw = np.array([11.1, 244.24, 7.25])  # km/s
 rsun_mw = np.array([-8.3, 0., 0.02])  # kpc
 
 
+def table2_results():
+    """
+    main results of paper in Table 2.
+    """
+
+    M = np.array([[120., 139., 64., 38.],
+                  [19., -59., -47., -37.],
+                  [16., 17.,23., 40.],
+                  [8., -10., -27., -9.],
+                  [-11., -13., -20., -24.],
+                  [-9., 9., 20., 17.],
+                  [103., 98., 100., 87.],
+                  [76., 78., 85., 70.],
+                  [61., 83., 96., 74.]]).T
+    
+    Eu = np.array([[9., 32., 23., 11.],
+                   [11., 15., 20., 11.],
+                   [2., 5., 7., 7.],
+                   [3., 4., 7., 7.],
+                   [2., 4., 6., 6.],
+                   [3., 5., 8., 7.],
+                   [2., 2., 4., 4.],
+                   [1., 2., 4., 5.],
+                   [1., 3., 4., 5.],]).T
+    
+    Ed = np.array([[-8., -31., -24., -11.],
+                   [-12., -12., -16., -10.],
+                   [-2., -5., -7., -7.],
+                   [-3.,-4., -7., -6.],
+                   [-2., -4., -6., -6.],
+                   [-3., -5., -7., -7.],
+                   [-2., -2., -4., -4.],
+                   [-1., -2., -4., -4.],
+                   [-1., -2., -4., -5.]]).T
+    
+    midpoints = np.array([23.85, 34.31, 44.14, 59.80])
+    return M, Eu, np.abs(Ed), midpoints
 def read_posterior(infile, raw=False, cosb=True):
     if raw == True:
         I = np.genfromtxt((infile + '.txt'))
@@ -130,11 +167,17 @@ def get_v(cube, rgal, vgal, solar=False):
     return l,b, dsun, vlos, mul, mub
 
 
-def plot_reflex_model(cube, rgal, vgal, ax=None, quant="vlos", vlosnorm=None,mulnorm=None,mubnorm=None):
+def plot_reflex_model(cube, rgal, vgal, ax=None, quant="vlos", vlosnorm=None,mulnorm=None,mubnorm=None, nobflip=False):
 
     #lapex, bapex, vtravel, vr, vphi, vtheta,siglos, sigl, sigb
 
     l,b,dist, vlos, mul, mub = get_v(cube,rgal*300., vgal*240./1.4, solar=False)
+
+    print("the first 5 values of dist, vlos, mul, mub are:")
+    print("dist: ", dist[:5])
+    print("vlos: ", vlos[:5])
+    print("vl: ", mul[:5])
+    print("vb: ", mub[:5])
 
     if ax == None:
         fig, ax = plt.subplots(3, facecolor="white", figsize=(4, 8), subplot_kw={'projection': 'mollweide'})
@@ -142,8 +185,14 @@ def plot_reflex_model(cube, rgal, vgal, ax=None, quant="vlos", vlosnorm=None,mul
         print("using axes defined outside function")
     # fig.patch.set_facecolor('black') #setting plot background to dark colour
 
-    l[l>np.pi]-=2.*np.pi
-    b = np.pi/2. - b
+    #change phi range to be compatible with the mollwiede projection
+    
+    if nobflip == True:
+        b = np.pi/2. - b
+        l = l
+    else:
+        l[l>np.pi]-=2.*np.pi
+        b = np.pi/2. - b
 
     if quant == "vlos":
         if vlosnorm is not None:
@@ -158,8 +207,95 @@ def plot_reflex_model(cube, rgal, vgal, ax=None, quant="vlos", vlosnorm=None,mul
             ax.scatter(-l, b, c=cm.coolwarm((mul - np.min(mul))/(np.max(mul)-np.min(mul))), cmap="seismic")
     elif quant == "mub":
         if mubnorm is not None:
-            ax.scatter(-l, b, c=cm.coolwarm((mul - np.min(mubnorm))/(np.max(mubnorm)-np.min(mubnorm))), cmap="seismic")
+            ax.scatter(-l, b, c=cm.coolwarm((mub - np.min(mubnorm))/(np.max(mubnorm)-np.min(mubnorm))), cmap="seismic")
         else:
             ax.scatter(-l, b, c=cm.coolwarm((mub - np.min(mub))/(np.max(mub)-np.min(mub)), cmap="seismic"))
 
+    return ax
+
+
+def make_apex_data(ax, color="k", marker="s", ebarc="k",label="YPP+24"):
+    """
+    Figure to reproduce figure 1. in the paper -- without the simulation lines!
+    """
+    M, Eu, Ed, midpoints = table2_results()
+
+    #convert phi range to 0,2pi for the fitted values
+    
+
+    ax[1].set_ylabel(r"$\ell_{\rm apex}$ [deg]")
+    
+    #apex L
+    ax[1].errorbar(midpoints, M[:,0], yerr = [Ed[:,0],Eu[:,0]], color=ebarc, fmt="none", capsize=3)
+    ax[1].scatter(midpoints,  M[:,0], c=color, marker=marker,s=20,zorder=100, label=label)
+    #V Travel
+    ax[0].errorbar(midpoints, M[:,2], yerr = [Ed[:,2],Eu[:,2]], color=ebarc, fmt="none", capsize=3)
+    ax[0].scatter(midpoints, M[:,2], c=color, marker=marker,s=20,zorder=100, label=label)
+    #b_apex
+    ax[2].scatter(midpoints,  M[:,1], c=color, marker=marker,s=20,zorder=100, label=label)
+    ax[2].errorbar(midpoints, M[:,1], yerr = [Ed[:,1],Eu[:,1]], color=ebarc,fmt="none", capsize=3)
+
+
+    ax[0].yaxis.set_minor_locator(MultipleLocator(5))
+    ax[0].yaxis.set_major_locator(MultipleLocator(10))
+    ax[0].tick_params(axis="x", which="both", labelbottom=False, direction="in")
+    ax[0].set_ylabel(r"$v_{travel}$ kms$^{-1}$ ")
+    ax[0].set_ylim(1,65)
+    
+    ax[1].yaxis.set_minor_locator(MultipleLocator(20))
+    ax[1].yaxis.set_major_locator(MultipleLocator(40))
+    ax[1].tick_params(axis="x", which="both", labelbottom=False, direction="in",top=True)
+    
+    ax[2].scatter(midpoints, M[:,1], c=color, marker=marker,s=20,zorder=100, label=label)
+    ax[2].yaxis.set_minor_locator(MultipleLocator(10))
+    ax[2].yaxis.set_major_locator(MultipleLocator(20))
+    ax[2].set_ylabel(r"$b_{\rm apex}$ [deg] ")
+    ax[2].set_xlabel(r"$r_{\rm galactocentric}$ kpc ")
+    ax[2].tick_params(axis="x", which="both", direction="in",top=True)
+    
+    #setting x axis for all plots
+    for i in ax:
+        i.tick_params(axis="y", labelsize=8)
+        i.set_xlim(15,100)
+        i.xaxis.set_minor_locator(MultipleLocator(5))
+        i.xaxis.set_major_locator(MultipleLocator(10))
+    print(midpoints)
+    return ax
+
+def make_bulk_motion_data(ax, color="k", marker="s",ebarc="g",label="YPP+24"):
+    M, Eu, Ed, midpoints = table2_results()
+    #vr
+    ax[0].errorbar(midpoints, M[:,3], yerr = [Ed[:,3],Eu[:,3]], color=ebarc,fmt="none", capsize=3)
+    ax[0].scatter(midpoints, M[:,3], c=color, marker=marker,s=20,zorder=100, label=label)
+    #vphi
+    ax[1].errorbar(midpoints, M[:,4], yerr = [Ed[:,4],Eu[:,4]], color=ebarc,fmt="none", capsize=3)
+    ax[1].scatter(midpoints, M[:,4], c=color, marker=marker,s=20,zorder=100, label=label)
+    #vtheta
+    ax[2].errorbar(midpoints, M[:,5], yerr = [Ed[:,5],Eu[:,5]], color=ebarc,fmt="none", capsize=3)
+    ax[2].scatter(midpoints, M[:,5], c=color, marker=marker,s=20,zorder=100, label=label)
+
+
+
+    ax[0].yaxis.set_minor_locator(MultipleLocator(5))
+    ax[0].yaxis.set_major_locator(MultipleLocator(10))
+    ax[0].set_ylabel(r"$v_{r}$ $\rm km ~s^{-1}$")
+    ax[0].tick_params(axis="x", which="both", labelbottom=False, direction="in")
+    
+    ax[1].yaxis.set_minor_locator(MultipleLocator(5))
+    ax[1].yaxis.set_major_locator(MultipleLocator(10))
+    ax[1].set_ylabel(r"$v_{\phi}$ $\rm km ~s^{-1}$ ")
+    ax[1].tick_params(axis="x", which="both", labelbottom=False, direction="in",top=True)
+    
+    ax[2].yaxis.set_minor_locator(MultipleLocator(5))
+    ax[2].yaxis.set_major_locator(MultipleLocator(10))
+    ax[2].set_ylabel(r"$v_{\theta}$ $\rm km ~s^{-1}$")
+    ax[2].set_xlabel(r"$r_{\rm galactocentric}$ kpc ")
+    ax[2].tick_params(axis="x", which="both", direction="in",top=True)
+
+    for i in ax:
+        i.tick_params(axis="y", labelsize=8)
+        i.set_xlim(15,100)
+        i.set_ylim(-40,40)
+        i.xaxis.set_minor_locator(MultipleLocator(5))
+        i.xaxis.set_major_locator(MultipleLocator(10))
     return ax
