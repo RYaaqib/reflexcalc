@@ -1,5 +1,4 @@
 import numpy as np
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pylab as plt
 import matplotlib.cm as cm
 from matplotlib.ticker import MultipleLocator
