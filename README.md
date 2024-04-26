@@ -16,7 +16,7 @@ This repo uses the packages/repositories:
 - [_pyMultinest_](https://github.com/JohannesBuchner/PyMultiNest): Buchner et al. [2014](http://www.aanda.org/articles/aa/abs/2014/04/aa22971-13/aa22971-13.html)
 - [_ReflexMotion_](https://github.com/michael-petersen/ReflexMotion) Petersen & Penarrubia ([2021](https://ui.adsabs.harvard.edu/abs/2021NatAs...5..251P/abstract))
 - _Numpy_ : Harris et. al ([2020](https://www.nature.com/articles/s41586-020-2649-2))
--_Matplotlib_: Hunter ([2007](https://ieeexplore.ieee.org/document/4160265))
+- _Matplotlib_: Hunter ([2007](https://ieeexplore.ieee.org/document/4160265))
 ---
 # File list
 - coord.py
