@@ -51,9 +51,18 @@ As this is not a "package" but just some code on github - You will need the foll
 - Pymultinest(only if you are using <code> Reflex_fit_data.py </code>).
 
 
+---
+# MultiNest.
 
+You will also need `MultiNest`. To install on OSX, 
 
+```
+git clone https://github.com/JohannesBuchner/MultiNest
+cd MultiNest/build
+cmake ..
+make
+```
 
-
+And export the path, `export DYLD_LIBRARY_PATH=/path/to/multinest/lib:$DYLD_LIBRARY_PATH`, such that `pymultinest` can recognise it.
 
 
