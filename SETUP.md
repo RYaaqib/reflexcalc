@@ -1,7 +1,7 @@
 
 # Set up MacOS example
 
-In case you need to get pyMultiNest to work on a Mac computer...
+In case you need to get pyMultiNest to work on a Mac computer.
 
 ## get Multinest
 
