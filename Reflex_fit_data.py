@@ -251,9 +251,11 @@ def Prior(cube):
     cube[3] = - 250. + cube[3] * (500.)  # vr
     cube[4] = - 250. + cube[4] * (500.)  # vphi
     cube[5] = - 250. + cube[5] * (500.)  # vth
-    cube[6] = (1. / 1000.) ** 2. + cube[6] * ((1. / 10.) ** 2. - ((1. / 1000.) ** 2.))  # sigvlos
-    cube[7] = (1. / 1000.) ** 2. + cube[7] * ((1. / 10.) ** 2. - ((1. / 1000.) ** 2.))  # sigpml
-    cube[8] = (1. / 1000.) ** 2. + cube[8] * ((1. / 10.) ** 2. - ((1. / 1000.) ** 2.))  # sipmb
+    maxsig2 = 1.e-1
+    minsig2 = 1.e-4
+    cube[6] = (minsig2) ** 2. + cube[6] * ((maxsig2) ** 2. - ((minsig2) ** 2.))  # sigvlos
+    cube[7] = (minsig2) ** 2. + cube[7] * ((maxsig2) ** 2. - ((minsig2) ** 2.))  # sigpml
+    cube[8] = (minsig2) ** 2. + cube[8] * ((maxsig2) ** 2. - ((minsig2) ** 2.))  # sipmb
 
     return cube
 
