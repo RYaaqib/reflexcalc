@@ -9,7 +9,15 @@ All are run by following the pattern (after creating the `chains` directory and 
 python Reflex_fit_data.py processed_real/sgrtests/data_file.txt chains/prefixdir/
 ```
 
-The chains can be inspected using `read_posterior.py`, which will produce the uncertainties.
+The chains can be inspected using `read_posterior.py`, which will produce the uncertainties. That is, in the Python interpreter,
+```
+from read_posterior import *
+D = get_binned_fit_medians('path/to/chains/')
+print(D[0]) # the medians
+print(D[1]) # the lower-bound uncertainties
+print(D[2]) # the upper-bound uncertainties
+```
+For test exploration, I will report the lower bound uncertainties only: for science work you'll want to look at both.
 
 All DR3 data (no Gaia designation) in the `processed_real/sgrtests` directory is created from the parent YPP24 data (the files without `dr2` in the string are DR3.). This data already has Sgr removed according to the PP21 Gaussian ball strategy. All DR2 data is created from the parent PP21 data, which does not have Sgr removed, and this we can test the effect of all Sgr cuts fairly. The isotropic halo is built from a standard EXP initial condition; there is nothing special about the halo itself. Any isotropic sphere of stars that sort of looks like the MW potential will do. This one isn't even that great (see note in the isotropic halo section).
 
@@ -25,13 +33,13 @@ The different abbreviations are:
 | Cut | Radius Limit | l | b | vtravel | vr | vphi | vtheta | sigmavlos | sigmul | sigmub | Nstars |
 |-----|--------------|---|---|---------|----|------|--------|-----------|--------|--------|--------|
 | 50 + data |
-| YPP24all (quoted) | 50+ | 38 ± 11 | -37 ± 11 | 40 ± 7 | -9 ± 7 | -24 ± 6 | 17 ± 7 | 87 ± 4 | 70 ± 5 | 74 ± 5 | 340 |
-| YPPKgiants (redo) | 50+ | 40 ± 11 | -36 ± 13 | 40 ± 7 | -5 ± 7 | -30 ± 6 | 19 ± 8 | 88 ± 5 | 61 ± 5 | 70 ± 5 | 253 | 
+| YPP24 K giants+BHBs  (quoted) | 50+ | 38 ± 11 | -37 ± 11 | 40 ± 7 | -9 ± 7 | -24 ± 6 | 17 ± 7 | 87 ± 4 | 70 ± 5 | 74 ± 5 | 340 |
+| YPP K giants (redo) | 50+ | 40 ± 11 | -36 ± 13 | 40 ± 7 | -5 ± 7 | -30 ± 6 | 19 ± 8 | 88 ± 5 | 61 ± 5 | 70 ± 5 | 253 | 
 | B24| 50+ | 36 ± 23 | -45 ± 21 | 27 ± 9 | -1 ± 9 | -19 ± 7 | 17 ± 9 | 90 ± 5 | 58 ± 5 | 58 ± 5 | 160 |
 | J21 | 50+ | 126 ± 26 | -18 ± 32 | 16 ± 6 | 2 ± 8 | 4 ± 6 | -16 ± 7 | 88 ± 5 | 36 ± 5 | 42 ± 5 | 153 |
 | 40+ data | 
-| YPP24all (quoted) | 40-50 | 
-| YPPKgiants | 40+ | 61 ± 15 | -50 ± 12 | 30 ± 6 | -15 ± 5 | -23 ± 5 | 26 ± 6 | 94 ± 3 | 77 ± 4 | 84 ± 4 | 531 |
+| YPP24 K giants+BHBs (quoted) | 40-50 | 64 ± 24 | -47 ± 20 | 23 ± 7 | -27 ± 7 | -20 ± 6 | 20 ± 8 | 100 ± 4 | 85 ± 4 | 96 ± 4 | 446
+| YPP K giants | 40+ | 61 ± 15 | -50 ± 12 | 30 ± 6 | -15 ± 5 | -23 ± 5 | 26 ± 6 | 94 ± 3 | 77 ± 4 | 84 ± 4 | 531 |
 | B24 | 40+ | 78 ± 22 | -23 ± 25 | 19 ± 7 | -3 ± 7 | -10 ± 7 | 10 ± 7 | 97 ± 4 | 74 ± 4 | 62 ± 4 | 319 |
 | J21 | 40+ | 141 ± 27 | 22 ± 23 | 13 ± 6 | -0.2 ± 6 | 10 ± 4 | -22 ± 5 | 92 ± 4 | 50 ± 3 | 56 ± 3 | 354 |
 
@@ -62,6 +70,23 @@ Summary:
 1. DR2 vs DR3 is not a significant difference in any of the Sgr cut scenarios (PP21 and B24 agree; J21 does not. PP21 is even consistent-ish with not making an Sgr cut!).
 2. In general, there isn't _that_ much Sgr-consistent material beyond 40 kpc, and particularly not past 50 kpc. The B24 cut could be combined with a very un-restrictive angular momentum cut (a larger PP21 ball enclosing the entirety of the Vasiliev 2021 model) and give a similar number to the PP21 cut at both 40+ and 50+. The J21 cut does remove a lot of stars, but I'm exploring that next...
 3. I attribute the small change (statistically consistent) between the reported PP21 and the redone PP21 results to come from a smaller number of MultiNest walkers used in this analysis and slightly updated peculiar velocities.
+
+### BHBs, DR2 data
+
+
+| Cut | Radius Limit | l | b | vtravel | vr | vphi | vtheta | sigmavlos | sigmul | sigmub | Nstars |
+|-----|--------------|---|---|---------|----|------|--------|-----------|--------|--------|--------|
+| 50+ data |
+| PP21 | 50+ | 32 ± 75 | -47 ± 30 | 26 ± 16 | -1 ± 11 | 36 ± 20 | 22 ± 23 | 79 ± 6 | 37 ± 54 | 100 ± 27 | 99
+| J21 | 50+ | -40 ± 85 | -21 ± 44 | 22 ± 20 | 24 ± 13 | 48 ± 27 | -78 ± 26 | 74 ± 8 | 13 ± 10 | 14 ± 9 | 51
+| 40+ data |
+| PP21 reported | 40+ | 59 ± 25 | -42 ± 19 | 26 ± 9 | -22 ± 8 | -9 ± 9 | -2 ± 10 | 91 ± 4 | 76 ± 8 | 96 ± 8 | 292
+| PP21 redo | 40+ | 60 ± 24 | -40 ± 20 | 32 ± 11 | -21 ± 9 | -6 ± 11 | 2 ± 13 | 93 ± 4 | 101 | 10 | 125 ± 10 | 298
+| J21 | 40+ | 127 ± 38 | -4 ± 31 | 22 ± 12 | -5 ± 10 | 15 ± 12 | -34 ± 13 | 98 ± 6 | 77 ± 10 | 70 ± 10 | 197
+
+Summary:
+1. Same results as for K Giants; suggests that there isn't an obvious bias in the inference of stellar properties (primarily distance).
+2. Lose signal for a dataset of 51 stars; but still get some constraints at 99 stars!
 
 ### Mock isotropic halo test
 
